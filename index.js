@@ -21,7 +21,6 @@ const fileType = (s) => {
 };
 
 const fileInfo = (f, s) => {
-  console.log({ s });
   const name = path.basename(f);
   const type = fileType(s);
   const file = f.replace(`${cwd}/`, "");
@@ -137,9 +136,7 @@ const untar = async (f, t) => {
   createReadStream(f).pipe(extract);
 
   for await (const entry of extract) {
-    console.log({ extract });
     const target = path.resolve(cwd, t, entry.header.name);
-    console.log({ target });
     await fs.mkdir(path.dirname(target), { recursive: true });
     if (entry.header.type === "file") {
       entry.pipe(createWriteStream(target));
@@ -156,7 +153,6 @@ const untar = async (f, t) => {
 
 const app = new Elysia()
   .onError(({ code, error }) => {
-    console.log({ code, error });
     const status = codeToStatus[code] || 500;
     return new Response(null, { status });
   })
@@ -165,12 +161,10 @@ const app = new Elysia()
     const stat = await fs.stat(f);
     if (!stat.isDirectory()) {
       const accept = request.headers.get("accept");
-      console.log({ accept });
       if (accept === "application/octet-stream") {
         return new Response(Bun.file(f));
       }
       const file = fileInfo(f, stat);
-      console.log({ file });
       return { success: true, file };
     }
     const dir = await fs.readdir(f);
@@ -196,7 +190,6 @@ const app = new Elysia()
     return new Response(null, { status: 204 });
   })
   .post("/compress", async ({ params, body, query }) => {
-    console.log({ body, query });
     const f = path.resolve(cwd, body.file);
     const format = body.format;
     if (format === "tar.gz") {
@@ -210,7 +203,6 @@ const app = new Elysia()
     }
   })
   .post("/decompress", async ({ params, body, query }) => {
-    console.log({ body, query });
     const f = path.resolve(cwd, body.file);
     const t = body.target || "/";
     const format = body.format;
