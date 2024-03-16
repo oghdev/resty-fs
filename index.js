@@ -9,8 +9,22 @@ import tarstream from "tar-stream";
 const port = process.env.PORT || 9000;
 const cwd = process.cwd();
 
+const fileType = (s) => {
+  if (s.isFile()) {
+    return "file";
+  } else if (s.isDirectory()) {
+    return "directory";
+  } else if (s.isLink()) {
+    return "link";
+  }
+  return "unknown";
+};
+
 const fileInfo = (f, s) => {
+  console.log({ s });
   const name = path.basename(f);
+  const type = fileType(s);
+  const file = f.replace(`${cwd}/`, "");
   const {
     atime,
     atimeMs,
@@ -32,7 +46,8 @@ const fileInfo = (f, s) => {
     uid,
   } = s;
   return {
-    file: f.replace(`${cwd}/`, ""),
+    type,
+    file,
     name,
     atime,
     atimeMs,
