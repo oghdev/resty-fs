@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "elysia": "^1.0.0",
-    "tar-stream": "^3.1.7"
+    "tar-stream": "^3.1.7",
+    "unzip-stream": "^0.3.1",
+    "zip-stream": "^6.0.1"
   },
   "scripts": {
     "dev": "bun --watch index.js"
