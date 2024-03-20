@@ -396,13 +396,14 @@ const createDirectoryHandlerValidator = {
 const getFileHandler = async ({ params, request }) => {
   const f = path.resolve(cwd, params["*"]);
   const stat = await fs.stat(f);
-  if (!stat.isDirectory()) {
-    const accept = request.headers.get("accept");
-    if (accept === "application/octet-stream") {
-      return new Response(Bun.file(f));
-    }
+  const accept = request.headers.get("accept");
+  if (!stat.isDirectory() && accept === "application/octet-stream") {
+    return new Response(Bun.file(f));
+  } else if (!stat.isDirectory()) {
     const file = fileInfo(f, stat);
     return { success: true, file };
+  } else if (stat.isDirectory() && accept === "application/octet-stream") {
+    return new Response(null, { status: 400 });
   }
   const dir = await fs.readdir(f);
   return {
